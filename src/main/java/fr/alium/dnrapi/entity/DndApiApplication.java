@@ -1,4 +1,4 @@
-package fr.alium.dnrapi;
+package fr.alium.dnrapi.entity;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

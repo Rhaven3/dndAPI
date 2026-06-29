@@ -1,4 +1,4 @@
-package fr.alium.dnrapi.enums;
+package fr.alium.dnrapi.entity.enums;
 
 public enum StatEnum {
     STRENGTH,

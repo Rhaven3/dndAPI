@@ -1,8 +1,8 @@
-package fr.alium.dnrapi;
+package fr.alium.dnrapi.entity;
 
-import fr.alium.dnrapi.enums.SenseEnum;
-import fr.alium.dnrapi.enums.SkillEnum;
-import fr.alium.dnrapi.enums.StatEnum;
+import fr.alium.dnrapi.entity.enums.SenseEnum;
+import fr.alium.dnrapi.entity.enums.SkillEnum;
+import fr.alium.dnrapi.entity.enums.StatEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
