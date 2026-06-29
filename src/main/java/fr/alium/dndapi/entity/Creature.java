@@ -4,6 +4,7 @@ import fr.alium.dndapi.entity.enums.SenseEnum;
 import fr.alium.dndapi.entity.enums.SkillEnum;
 import fr.alium.dndapi.entity.enums.StatEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,20 +22,28 @@ public class Creature {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false)
     private String name;
     private String description;
+    @NotNull
     private Integer maxHP;
     private String maxHD;
+    @NotNull
     private Integer baseCA;
+
     private Integer initiative;
     @ElementCollection
+    @NotEmpty
+    @Size(min = 6, max = 6, message = "il y a 6 stats dans D&D fdp")
     private Map<StatEnum, Integer> stats;
     private List<SkillEnum>  skills;
     @ElementCollection
     private Map<SenseEnum, Integer> senses;
     @ManyToMany
     private List<Language> languages;
-    private Integer CR;
+    @DecimalMin("0.125")
+    @DecimalMax("30.00")
+    private Float CR;
     @ManyToMany
     private List<Trait> traits;
     @ManyToMany
