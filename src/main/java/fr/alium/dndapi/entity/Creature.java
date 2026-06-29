@@ -1,8 +1,8 @@
-package fr.alium.dnrapi.entity;
+package fr.alium.dndapi.entity;
 
-import fr.alium.dnrapi.entity.enums.SenseEnum;
-import fr.alium.dnrapi.entity.enums.SkillEnum;
-import fr.alium.dnrapi.entity.enums.StatEnum;
+import fr.alium.dndapi.entity.enums.SenseEnum;
+import fr.alium.dndapi.entity.enums.SkillEnum;
+import fr.alium.dndapi.entity.enums.StatEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +24,7 @@ public class Creature {
     private String name;
     private String description;
     private Integer maxHP;
+    private String maxHD;
     private Integer baseCA;
     private Integer initiative;
     @ElementCollection

@@ -1,4 +1,4 @@
-package fr.alium.dnrapi.entity;
+package fr.alium.dndapi.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
-public class Trait {
+public class ActionDnD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

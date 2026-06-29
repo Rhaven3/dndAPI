@@ -1,4 +1,4 @@
-package fr.alium.dnrapi.entity.enums;
+package fr.alium.dndapi.entity.enums;
 
 public enum SenseEnum {
     PASSIVE_PERCEPTION,

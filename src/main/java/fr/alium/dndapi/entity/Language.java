@@ -1,27 +1,23 @@
-package fr.alium.dnrapi.entity;
+package fr.alium.dndapi.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class Encounter {
+public class Language {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String description;
-    @ManyToMany
-    private List<Creature> creatures;
-
-    public void getDifficulty() {
-    }
 }
