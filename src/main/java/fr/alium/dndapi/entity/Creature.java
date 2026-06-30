@@ -41,9 +41,8 @@ public class Creature {
     private Map<SenseEnum, Integer> senses;
     @ManyToMany
     private List<Language> languages;
-    @DecimalMin("0.125")
-    @DecimalMax("30.00")
-    private Float CR;
+    @Size(min = 0, max = 33)
+    private Integer CR;
     @ManyToMany
     private List<Trait> traits;
     @ManyToMany

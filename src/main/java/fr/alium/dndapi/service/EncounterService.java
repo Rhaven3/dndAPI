@@ -1,8 +1,8 @@
 package fr.alium.dndapi.service;
 
+import fr.alium.dndapi.entity.Creature;
 import fr.alium.dndapi.entity.Encounter;
 import fr.alium.dndapi.entity.enums.EncounterDifficultyEnum;
-import fr.alium.dndapi.repository.CreatureRepository;
 import fr.alium.dndapi.repository.EncounterRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,6 +31,7 @@ public class EncounterService {
         int Xptreshold = getXpTreshold(difficulty, partyAverageLvl) * partySize;
         int xpdaily = getXpDaily(partyAverageLvl) * partySize;
 
+        List<Creature> creatures = creatureService.findByXpTreshold(Xptreshold, numberCreatures);
 
 
         Encounter encounter = Encounter.builder()

@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ICreatureService {
     List<Creature> findAll();
+
+    List<Creature> findByXpTreshold(int xptreshold, int numberCreatures);
 }
