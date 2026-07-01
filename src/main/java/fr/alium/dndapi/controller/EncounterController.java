@@ -2,7 +2,6 @@ package fr.alium.dndapi.controller;
 
 import fr.alium.dndapi.entity.Encounter;
 import fr.alium.dndapi.entity.dto.GenerateEncounterDTO;
-import fr.alium.dndapi.repository.CreatureRepository;
 import fr.alium.dndapi.repository.EncounterRepository;
 import fr.alium.dndapi.service.EncounterService;
 import org.springframework.http.ResponseEntity;
@@ -75,13 +74,17 @@ public class EncounterController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
-        return encounterService.generate(
+
+        if (generateEncounterDTO.getDifficulty() == null) return ResponseEntity.badRequest().build();
+        if (generateEncounterDTO.getPartySize() == null) return ResponseEntity.badRequest().build();
+        if (generateEncounterDTO.getNumberCreatures() == null) return ResponseEntity.badRequest().build();
+
+        Encounter encounter = encounterService.generate(
                 generateEncounterDTO.getDifficulty(),
-                generateEncounterDTO.getChallengeRate(),
                 generateEncounterDTO.getPartySize(),
                 generateEncounterDTO.getPartyAverageLvl(),
-                generateEncounterDTO.getNumberEncounters(),
                 generateEncounterDTO.getNumberCreatures()
         );
+        return ResponseEntity.ok(encounter);
     }
 }

@@ -4,6 +4,8 @@ import fr.alium.dndapi.entity.Creature;
 import fr.alium.dndapi.entity.Encounter;
 import fr.alium.dndapi.entity.enums.EncounterDifficultyEnum;
 import fr.alium.dndapi.repository.EncounterRepository;
+import fr.alium.dndapi.service.interfaces.ICreatureService;
+import fr.alium.dndapi.service.interfaces.IEncounterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -11,50 +13,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class EncounterService {
+public class EncounterService implements IEncounterService {
     EncounterRepository encounterRepository;
-    CreatureService creatureService;
+    ICreatureService creatureService;
 
-    public EncounterService(EncounterRepository encounterRepository,  CreatureService creatureService) {
+    public EncounterService(EncounterRepository encounterRepository, ICreatureService creatureService) {
         this.encounterRepository = encounterRepository;
         this.creatureService = creatureService;
     }
 
-    public ResponseEntity<?> generate(EncounterDifficultyEnum difficulty, Integer challengeRate, Integer partySize, Integer partyAverageLvl, Integer numberEncounters, Integer numberCreatures) {
-        if (difficulty == null) return ResponseEntity.badRequest().build();
-        if (partyAverageLvl == null) return ResponseEntity.badRequest().build();
-//        if (challengeRate == null) return ResponseEntity.badRequest().build();
+    @Override
+    public Encounter generate(EncounterDifficultyEnum difficulty, Integer partySize, Integer partyAverageLvl, Integer numberCreatures) {
         if (partySize == null) partySize = 4;
-        if (numberEncounters == null) numberEncounters = 1;
-        if (numberCreatures == null) return ResponseEntity.badRequest().build();
+//        if (numberEncounters == null) numberEncounters = 1;
 
         int Xptreshold = getXpTreshold(difficulty, partyAverageLvl) * partySize;
-        int xpdaily = getXpDaily(partyAverageLvl) * partySize;
 
         List<Creature> creatures = creatureService.findByXpTreshold(Xptreshold, numberCreatures);
 
-
         Encounter encounter = Encounter.builder()
                 .name("Generated Encounter " + Xptreshold)
-                .creatures()
+                .creatures(creatures)
                 .build();
         encounterRepository.save(encounter);
-
-        return ResponseEntity.ok(encounter);
+        return encounter;
     }
 
-    private int getXpDaily(Integer partyAverageLvl) {
-        int[] xpDailyTable = {
-                300, 600, 1200, 1700, 3500,
-                4000, 5000, 6000, 7500, 9000,
-                10500, 11500, 13500, 15000, 18000,
-                20000, 25000, 27000, 30000, 40000
-        };
-
-        return xpDailyTable[partyAverageLvl];
-    }
-
-    private int getXpTreshold(EncounterDifficultyEnum difficulty, Integer partyAverageLvl) {
+    @Override
+    public int getXpTreshold(EncounterDifficultyEnum difficulty, Integer partyAverageLvl) {
         List<List<Integer>> xpTresholdTable = new ArrayList<>();
         xpTresholdTable.add(List.of(25, 50, 75, 100));
         xpTresholdTable.add(List.of(50, 100, 150, 200));

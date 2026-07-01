@@ -73,12 +73,12 @@ public class CreatureRepoTests {
         creatureRepository.save(creature);
     }
 
-//    @AfterEach
-//    public void tearDown() {
-//        creatureRepository.delete(creature);
-//        languageRepository.deleteAll(languages);
-//        traitRepository.delete(trait);
-//    }
+    @AfterEach
+    public void tearDown() {
+        creatureRepository.delete(creature);
+        languageRepository.deleteAll(languages);
+        traitRepository.delete(trait);
+    }
 
     @Test
     public void create() {
