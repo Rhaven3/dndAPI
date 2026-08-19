@@ -71,7 +71,7 @@ public class CreatureService implements fr.alium.dndapi.service.interfaces.ICrea
 
     @Override
     public Creature findRandomByCR(int cr) {
-        List<Creature> creatures = creatureRepository.findAllByCr(cr);
+        List<Creature> creatures = creatureRepository.findAllByCR(cr);
         Random random = new Random();
         int index = random.nextInt(creatures.size());
         return creatures.get(index);
