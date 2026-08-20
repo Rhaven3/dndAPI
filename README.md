@@ -7,4 +7,5 @@ l'API de l'application pour les MJs de gestion et génération d'encounter et de
 - Gradle
 - Spring JPA
 - Spring Security
-- BDD: Microsoft SQL / MySQL Server (au dépend du pc)
+- BDD: MySQL Server
+- Docker
