@@ -1,11 +1,11 @@
 package fr.alium.dndapi.service;
 
-import fr.alium.dndapi.entity.Creature;
-import fr.alium.dndapi.entity.Encounter;
-import fr.alium.dndapi.entity.enums.EncounterDifficultyEnum;
-import fr.alium.dndapi.repository.EncounterRepository;
-import fr.alium.dndapi.service.interfaces.ICreatureService;
-import fr.alium.dndapi.service.interfaces.IEncounterService;
+import fr.alium.dndapi.feature.creature.entity.Creature;
+import fr.alium.dndapi.feature.encounter.entity.Encounter;
+import fr.alium.dndapi.feature.encounter.entity.EncounterDifficultyEnum;
+import fr.alium.dndapi.feature.encounter.EncounterRepository;
+import fr.alium.dndapi.feature.creature.ICreatureService;
+import fr.alium.dndapi.feature.encounter.IEncounterService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
