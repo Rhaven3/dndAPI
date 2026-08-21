@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @Embeddable
 public class Difficulty {
-    private int xp;
-    private int proficiencyBonus;
+    private Integer XP;
+    private Integer ProficiencyBonus;
     @Size(max = 33)
-    private float challengeRating;
+    private Float ChallengeRate;
 }

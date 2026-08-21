@@ -1,5 +1,6 @@
 package fr.alium.dndapi.feature.creature.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,11 +15,12 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class Stat {
     @NotNull
-    private String name;
+    private String Name;
     @NotNull
-    private Integer value;
+    private Integer Value;
     @NotNull
-    private Integer modifier;
+    @Column(name = "modifier")
+    private Integer Mod;
     @NotNull
-    private Integer save;
+    private Integer Save;
 }

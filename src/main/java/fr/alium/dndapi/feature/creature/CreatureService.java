@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class CreatureService implements ICreatureService {
+public class CreatureService {
     CreatureRepository creatureRepository;
 
     private final List<List<Integer>> subsetXP;
@@ -23,7 +23,6 @@ public class CreatureService implements ICreatureService {
         );
     }
 
-    @Override
     public List<Creature> findByXpTreshold(int xptreshold, int numberCreatures) {
         Random random = new Random();
         List<Creature> creatures = new ArrayList<>();
@@ -36,7 +35,6 @@ public class CreatureService implements ICreatureService {
         return creatures;
     }
 
-    @Override
     public List<List<Integer>> findAllSubsetCR(int sumTarget, int numberCreatures) {
         List<List<Integer>> result = new ArrayList<>();
         backtrack(numberCreatures, sumTarget, 0, new Stack<>(), 0, 0);
@@ -69,17 +67,15 @@ public class CreatureService implements ICreatureService {
         }
     }
 
-    @Override
-    public Creature findRandomByCR(int cr) {
-        List<Creature> creatures = creatureRepository.findAllByDifficulty(Difficulty.builder().challengeRating(cr).build());
+    public Creature findRandomByCR(float cr) {
+        List<Creature> creatures = creatureRepository.findAllByDifficulty(Difficulty.builder().ChallengeRate(cr).build());
         Random random = new Random();
         int index = random.nextInt(creatures.size());
         return creatures.get(index);
     }
 
-    @Override
     public int getXp(Creature creature) {
-        float cr = creature.getDifficulty().getChallengeRating();
+        float cr = creature.getDifficulty().getChallengeRate();
         return xpTable.get((int) Math.ceil(cr) - 1);
     }
 

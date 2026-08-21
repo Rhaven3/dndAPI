@@ -1,7 +1,7 @@
 package fr.alium.dndapi.feature.encounter;
 
+import fr.alium.dndapi.feature.creature.CreatureService;
 import fr.alium.dndapi.feature.creature.entity.Creature;
-import fr.alium.dndapi.feature.creature.ICreatureService;
 import fr.alium.dndapi.feature.encounter.entity.Encounter;
 import fr.alium.dndapi.feature.encounter.entity.EncounterDifficultyEnum;
 import org.springframework.stereotype.Service;
@@ -12,9 +12,9 @@ import java.util.List;
 @Service
 public class EncounterService implements IEncounterService {
     EncounterRepository encounterRepository;
-    ICreatureService creatureService;
+    CreatureService creatureService;
 
-    public EncounterService(EncounterRepository encounterRepository, ICreatureService creatureService) {
+    public EncounterService(EncounterRepository encounterRepository, CreatureService creatureService) {
         this.encounterRepository = encounterRepository;
         this.creatureService = creatureService;
     }

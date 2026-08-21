@@ -4,7 +4,6 @@ import fr.alium.dndapi.feature.creature.entity.Creature;
 import fr.alium.dndapi.feature.encounter.entity.Encounter;
 import fr.alium.dndapi.feature.encounter.entity.EncounterDifficultyEnum;
 import fr.alium.dndapi.feature.encounter.EncounterRepository;
-import fr.alium.dndapi.feature.creature.ICreatureService;
 import fr.alium.dndapi.feature.encounter.IEncounterService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

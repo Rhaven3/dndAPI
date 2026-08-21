@@ -15,8 +15,10 @@ public class ActionDnD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true,  nullable = false)
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
+    @Column(nullable = false)
     private ActionEnum type;
 }

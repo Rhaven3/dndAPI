@@ -62,15 +62,23 @@ public class CreatureMapper implements EntityMapper<Creature, CreatureDTO> {
         List<Defense> immunities = new ArrayList<>();
         List<Defense> vulnerabilities = new ArrayList<>();
 
-        for (DefenseDTO defenseDTO : creatureDTO.getResistances()) {
-            resistances.addAll(defenseMapper.toEntities(defenseDTO));
+        if (creatureDTO.getResistances() != null) {
+            for (DefenseDTO defenseDTO : creatureDTO.getResistances()) {
+                resistances.addAll(defenseMapper.toEntities(defenseDTO));
+            }
         }
-        for (DefenseDTO defenseDTO : creatureDTO.getImmunities()) {
-            immunities.addAll(defenseMapper.toEntities(defenseDTO));
+        if (creatureDTO.getImmunities() != null) {
+            for (DefenseDTO defenseDTO : creatureDTO.getImmunities()) {
+                immunities.addAll(defenseMapper.toEntities(defenseDTO));
+            }
         }
-        for (DefenseDTO defenseDTO : creatureDTO.getVulnerabilities()) {
-            vulnerabilities.addAll(defenseMapper.toEntities(defenseDTO));
+
+        if (creatureDTO.getVulnerabilities() != null) {
+            for (DefenseDTO defenseDTO : creatureDTO.getVulnerabilities()) {
+                vulnerabilities.addAll(defenseMapper.toEntities(defenseDTO));
+            }
         }
+
 
         return Creature.builder()
                 .name(creatureDTO.getName())

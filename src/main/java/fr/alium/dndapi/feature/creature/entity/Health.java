@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class Health {
     @NotNull
-    private Integer maxHP;
-    private Integer maxHD;
-    private Integer hitDice;
-    private Integer bonus;
-    private String specification;
+    private Integer MaxHealth;
+    private Integer MaxHitDice;
+    private Integer HitDice;
+    private Integer Bonus;
+    private String Specification;
 }
