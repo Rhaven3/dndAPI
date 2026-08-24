@@ -6,9 +6,11 @@ import fr.alium.dndapi.feature.actionDnd.entity.ActionDnD;
 import fr.alium.dndapi.feature.actionDnd.entity.dto.ActionDTO;
 import fr.alium.dndapi.feature.creature.entity.Creature;
 import fr.alium.dndapi.feature.creature.entity.dto.CreatureDTO;
+import fr.alium.dndapi.feature.creature.entity.dto.CreatureResponseDTO;
 import fr.alium.dndapi.feature.language.Language;
 import fr.alium.dndapi.feature.language.LanguageRepository;
 import jakarta.validation.Valid;
+import org.hibernate.Hibernate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -21,28 +23,25 @@ import java.util.List;
 @RequestMapping("/creature")
 public class CreatureController {
     private final CreatureRepository creatureRepository;
-    private final LanguageRepository languageRepository;
-    private final ActionDnDRepository actionDnDRepository;
     private final CreatureMapper creatureMapper;
-    private final ActionMapper actionMapper;
+    private final CreatureService creatureService;
 
     public CreatureController(
-            CreatureRepository creatureRepository,
-            LanguageRepository languageRepository,
-            ActionDnDRepository actionDnDRepository,
-            CreatureMapper creatureMapper, ActionMapper actionMapper
+            CreatureRepository creatureRepository, CreatureMapper creatureMapper, CreatureService creatureService
     ) {
         this.creatureRepository = creatureRepository;
-        this.languageRepository = languageRepository;
-        this.actionDnDRepository = actionDnDRepository;
         this.creatureMapper = creatureMapper;
-        this.actionMapper = actionMapper;
+        this.creatureService = creatureService;
     }
 
     @GetMapping
-    public ResponseEntity<List<Creature>> readAll() {
-        List<Creature> creatures = creatureRepository.findAll();
-        return ResponseEntity.ok(creatures);
+    public ResponseEntity<List<CreatureResponseDTO>> readAll() {
+        List<Creature> creatures = creatureService.getAllCreatures();
+        List<CreatureResponseDTO> creatureResponseDTOS = new ArrayList<>();
+        for (Creature creature : creatures) {
+            creatureResponseDTOS.add(creatureMapper.toResponseDto(creature));
+        }
+        return ResponseEntity.ok(creatureResponseDTOS);
     }
 
     @GetMapping("{id}")
@@ -56,36 +55,11 @@ public class CreatureController {
 
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreatureDTO creatureDTO, BindingResult result) {
-
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-        // creation language enfant
-        List<Language> languages = new ArrayList<>();
-        if (!creatureDTO.getLanguages().isEmpty()) {
-            for (String language : creatureDTO.getLanguages()) {
-                Language languageEntity = Language.builder()
-                        .name(language)
-                        .build();
-                languageRepository.save(languageEntity);
-                languages.add(languageEntity);
-            }
-        }
-        // creation ActionDnD enfants
-        List<ActionDnD> actions = new ArrayList<>();
-        if (!creatureDTO.getActions().isEmpty()) {
-            for (ActionDTO action : creatureDTO.getActions()) {
-                ActionDnD actionDnD = actionMapper.toEntity(action);
-                actionDnDRepository.save(actionDnD);
-                actions.add(actionDnD);
-            }
-        }
 
-        Creature creature = creatureMapper.toEntity(creatureDTO);
-        creature.setLanguages(languages);
-        creature.setActions(actions);
-
-        creatureRepository.save(creature);
+        creatureService.create(creatureDTO);
         return ResponseEntity.ok("creature created");
     }
 

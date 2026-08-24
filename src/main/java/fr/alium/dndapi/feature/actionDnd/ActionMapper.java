@@ -4,6 +4,7 @@ import fr.alium.dndapi.common.EntityMapper;
 import fr.alium.dndapi.feature.actionDnd.entity.ActionDnD;
 import fr.alium.dndapi.feature.actionDnd.entity.ActionEnum;
 import fr.alium.dndapi.feature.actionDnd.entity.dto.ActionDTO;
+import fr.alium.dndapi.feature.actionDnd.entity.dto.ActionResponseDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +15,15 @@ public class ActionMapper implements EntityMapper<ActionDnD, ActionDTO> {
                 .Name(actionDnD.getName())
                 .Description(actionDnD.getDescription())
                 .ActionType(actionDnD.getType().getText())
+                .build();
+    }
+
+    public ActionResponseDTO toResponseDto(ActionDnD actionDnD) {
+        return ActionResponseDTO.builder()
+                .id(actionDnD.getId())
+                .name(actionDnD.getName())
+                .description(actionDnD.getDescription())
+                .type(actionDnD.getType().getText())
                 .build();
     }
 

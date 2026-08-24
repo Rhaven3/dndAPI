@@ -1,5 +1,6 @@
 package fr.alium.dndapi.feature.actionDnd.entity;
 
+import fr.alium.dndapi.feature.creature.entity.Creature;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,4 +22,6 @@ public class ActionDnD {
     private String description;
     @Column(nullable = false)
     private ActionEnum type;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Creature creature;
 }

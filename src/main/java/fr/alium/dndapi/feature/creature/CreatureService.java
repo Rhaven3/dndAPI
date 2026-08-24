@@ -1,20 +1,33 @@
 package fr.alium.dndapi.feature.creature;
 
+import fr.alium.dndapi.feature.actionDnd.ActionMapper;
+import fr.alium.dndapi.feature.actionDnd.entity.ActionDnD;
+import fr.alium.dndapi.feature.actionDnd.entity.dto.ActionDTO;
 import fr.alium.dndapi.feature.creature.entity.Creature;
 import fr.alium.dndapi.feature.creature.entity.Difficulty;
+import fr.alium.dndapi.feature.creature.entity.dto.CreatureDTO;
+import fr.alium.dndapi.feature.language.Language;
+import fr.alium.dndapi.feature.language.LanguageRepository;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class CreatureService {
-    CreatureRepository creatureRepository;
+    private final CreatureRepository creatureRepository;
+    private final LanguageRepository languageRepository;
+    private final ActionMapper actionMapper;
+    private final CreatureMapper creatureMapper;
 
     private final List<List<Integer>> subsetXP;
     private final List<Integer> xpTable;
 
-    public CreatureService(CreatureRepository creatureRepository) {
+    public CreatureService(CreatureRepository creatureRepository, LanguageRepository languageRepository, ActionMapper actionMapper, CreatureMapper creatureMapper) {
         this.creatureRepository = creatureRepository;
+        this.languageRepository = languageRepository;
+        this.actionMapper = actionMapper;
+        this.creatureMapper = creatureMapper;
         this.subsetXP = new ArrayList<>();
         this.xpTable = Arrays.asList(25, 50, 100,
                 200, 450, 700, 1100, 1800, 2300, 2900, 3900, 5000, 5900,
@@ -79,4 +92,60 @@ public class CreatureService {
         return xpTable.get((int) Math.ceil(cr) - 1);
     }
 
+    public void create(CreatureDTO creatureDTO) {
+
+        // creation language enfant
+        List<Language> languages = new ArrayList<>();
+        if (!creatureDTO.getLanguages().isEmpty()) {
+            for (String language : creatureDTO.getLanguages()) {
+                Language languageEntity = Language.builder()
+                        .name(language)
+                        .build();
+                Language languageExistant = languageRepository.findByName(language);
+                if (languageExistant == null) {
+                    languageRepository.save(languageEntity);
+                    languages.add(languageEntity);
+                } else {
+                    languages.add(languageExistant);
+                }
+            }
+        }
+
+        List<ActionDnD> actions = new ArrayList<>();
+
+        Creature creature = creatureMapper.toEntity(creatureDTO);
+        creature.setActions(actions);
+        creature.setLanguages(languages);
+
+        creatureRepository.save(creature);
+
+        // creation ActionDnD enfants
+        if (!creatureDTO.getActions().isEmpty()) {
+            for (ActionDTO action : creatureDTO.getActions()) {
+                ActionDnD actionDnD = actionMapper.toEntity(action);
+                actionDnD.setCreature(creature);
+                actions.add(actionDnD);
+            }
+        }
+
+        creature.setActions(actions);
+        creatureRepository.save(creature);
+    }
+
+    public List<Creature> getAllCreatures() {
+        List<Creature> creatures = creatureRepository.findAll();
+        creatures.forEach(creature -> {
+            Hibernate.initialize(creature.getActions());
+            Hibernate.initialize(creature.getSkills());
+            Hibernate.initialize(creature.getSenses());
+            Hibernate.initialize(creature.getLanguages());
+            Hibernate.initialize(creature.getStats());
+            Hibernate.initialize(creature.getResistances());
+            Hibernate.initialize(creature.getImmunities());
+            Hibernate.initialize(creature.getVulnerabilities());
+//            Hibernate.initialize(creature.getGears());
+        });
+
+        return creatures;
+    }
 }

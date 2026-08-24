@@ -4,9 +4,11 @@ import fr.alium.dndapi.common.EntityMapper;
 import fr.alium.dndapi.feature.actionDnd.ActionMapper;
 import fr.alium.dndapi.feature.actionDnd.entity.ActionDnD;
 import fr.alium.dndapi.feature.actionDnd.entity.dto.ActionDTO;
+import fr.alium.dndapi.feature.actionDnd.entity.dto.ActionResponseDTO;
 import fr.alium.dndapi.feature.creature.entity.Creature;
 import fr.alium.dndapi.feature.creature.entity.Defense;
 import fr.alium.dndapi.feature.creature.entity.dto.CreatureDTO;
+import fr.alium.dndapi.feature.creature.entity.dto.CreatureResponseDTO;
 import fr.alium.dndapi.feature.creature.entity.dto.DefenseDTO;
 import fr.alium.dndapi.feature.creature.entity.enums.SenseEnum;
 import fr.alium.dndapi.feature.creature.entity.enums.SkillEnum;
@@ -36,25 +38,83 @@ public class CreatureMapper implements EntityMapper<Creature, CreatureDTO> {
         return null;
     }
 
+    public CreatureResponseDTO toResponseDto(Creature creature) {
+        List<ActionResponseDTO> actionResponseDTOs = new ArrayList<>();
+        if (creature.getActions() != null) {
+            for (ActionDnD actionDnD : creature.getActions()) {
+                actionResponseDTOs.add(actionMapper.toResponseDto(actionDnD));
+            }
+        }
+
+        Map<String, Integer> skills = new HashMap<>();
+        if (creature.getSkills() != null) {
+            for (Map.Entry<SkillEnum, Integer> entry : creature.getSkills().entrySet()) {
+                skills.put(entry.getKey().getText(), entry.getValue());
+            }
+        }
+
+        Map<String, Integer> senses = new HashMap<>();
+        if (creature.getSenses() != null) {
+            for (Map.Entry<SenseEnum, Integer> entry : creature.getSenses().entrySet()) {
+                senses.put(entry.getKey().getText(), entry.getValue());
+            }
+        }
+
+        return CreatureResponseDTO.builder()
+                .id(creature.getId())
+                .name(creature.getName())
+                .description(creature.getDescription())
+                .size(creature.getSize())
+                .type(creature.getType())
+                .alignment(creature.getAlignment())
+                .habitat(creature.getHabitat())
+                .treasure(creature.getTreasure())
+                .book(creature.getBook())
+                .image(creature.getImage())
+                .health(creature.getHealth())
+                .baseCA(creature.getBaseCA())
+                .caSpecification(creature.getCAspecification())
+                .speeds(creature.getSpeeds())
+                .resistances(creature.getResistances())
+                .immunities(creature.getImmunities())
+                .vulnerabilities(creature.getVulnerabilities())
+                .stats(creature.getStats())
+                .skills(skills)
+                .senses(senses)
+                .gears(creature.getGears())
+                .languages(creature.getLanguages())
+                .difficulty(creature.getDifficulty())
+                .actions(actionResponseDTOs)
+                .build();
+    }
+
     @Override
     public Creature toEntity(CreatureDTO creatureDTO) {
         Map<SkillEnum, Integer> skills = new HashMap<>();
-        for (Map.Entry<String, Integer> entry : creatureDTO.getSkills().entrySet()) {
-            skills.put(SkillEnum.fromString(entry.getKey()), entry.getValue());
+        if (creatureDTO.getSkills() != null) {
+            for (Map.Entry<String, Integer> entry : creatureDTO.getSkills().entrySet()) {
+                skills.put(SkillEnum.fromString(entry.getKey()), entry.getValue());
+            }
         }
 
         Map<SenseEnum, Integer> senses = new HashMap<>();
-        for (Map.Entry<String, Integer> entry : creatureDTO.getSenses().entrySet()) {
-            senses.put(SenseEnum.fromString(entry.getKey()), entry.getValue());
+        if (creatureDTO.getSenses() != null) {
+            for (Map.Entry<String, Integer> entry : creatureDTO.getSenses().entrySet()) {
+                senses.put(SenseEnum.fromString(entry.getKey()), entry.getValue());
+            }
         }
 
         List<Language> languages = new ArrayList<>();
-        for (String languageName : creatureDTO.getLanguages()) {
-            languages.add(languageRepository.findByName(languageName));
+        if (creatureDTO.getLanguages() != null) {
+            for (String languageName : creatureDTO.getLanguages()) {
+                languages.add(languageRepository.findByName(languageName));
+            }
         }
         List<ActionDnD> actions = new ArrayList<>();
-        for (ActionDTO action : creatureDTO.getActions()) {
-            actions.add(actionMapper.toEntity(action));
+        if (creatureDTO.getActions() != null) {
+            for (ActionDTO action : creatureDTO.getActions()) {
+                actions.add(actionMapper.toEntity(action));
+            }
         }
 
         // defenses
@@ -106,4 +166,5 @@ public class CreatureMapper implements EntityMapper<Creature, CreatureDTO> {
                 .actions(actions)
                 .build();
     }
+
 }

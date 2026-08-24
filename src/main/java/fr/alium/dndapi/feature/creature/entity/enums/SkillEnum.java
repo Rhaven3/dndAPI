@@ -17,6 +17,7 @@ public enum SkillEnum {
     NATURE("nature"),
     PERCEPTION("perception"),
     PERSUASION("persuasion"),
+    PERFORMANCE("performance"),
     RELIGION("religion"),
     SLEIGHT_OF_HAND("sleight of hand"),
     STEALTH("stealth"),

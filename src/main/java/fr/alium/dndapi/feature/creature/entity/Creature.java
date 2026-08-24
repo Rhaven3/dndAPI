@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Builder
 @Entity
+@BatchSize(size = 10)
 public class Creature {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,6 +72,6 @@ public class Creature {
     private List<Language> languages;
     @Embedded
     private Difficulty difficulty;
-    @ManyToMany
+    @OneToMany(mappedBy = "creature", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ActionDnD> actions;
 }
