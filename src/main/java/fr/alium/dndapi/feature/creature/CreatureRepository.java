@@ -8,7 +8,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CreatureRepository extends JpaRepository<Creature, Long> {
-//    @EntityGraph(attributePaths = {"actions", "skills", "senses"})
+//    @EntityGraph(attributePaths = {
+//            "actions",
+//            "skills",
+//            "senses",
+//            "gears",
+//            "languages",
+//            "speeds",
+//            "resistances",
+//            "immunities",
+//            "vulnerabilities",
+//            "stats"
+//    })
 //    List<Creature> findAll();
     List<Creature> findAllByDifficulty(Difficulty difficulty);
 }

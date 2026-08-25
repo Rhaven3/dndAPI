@@ -36,11 +36,10 @@ public class CreatureController {
 
     @GetMapping
     public ResponseEntity<List<CreatureResponseDTO>> readAll() {
-        List<Creature> creatures = creatureService.getAllCreatures();
-        List<CreatureResponseDTO> creatureResponseDTOS = new ArrayList<>();
-        for (Creature creature : creatures) {
-            creatureResponseDTOS.add(creatureMapper.toResponseDto(creature));
-        }
+        List<CreatureResponseDTO> creatureResponseDTOS = creatureService.getAllCreatures();
+//        List<CreatureResponseDTO> creatureResponseDTOS = creatureRepository.findAll().stream()
+//                .map(creatureMapper::toResponseDto)
+//                .toList();
         return ResponseEntity.ok(creatureResponseDTOS);
     }
 

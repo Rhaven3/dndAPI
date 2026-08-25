@@ -22,7 +22,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Builder
 @Entity
-@BatchSize(size = 10)
+@BatchSize(size = 3)
 public class Creature {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,25 +48,25 @@ public class Creature {
     private Integer baseCA;
     private String CAspecification;
     @NotEmpty
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<Speed> speeds;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<Defense> resistances;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<Defense> immunities;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<Defense> vulnerabilities;
 
     @NotEmpty
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     @Size(min = 7, max = 7, message = "il y a 7 stats dans D&D, initiative compris")
     private List<Stat> stats;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     private Map<SkillEnum, Integer> skills;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     private Map<SenseEnum, Integer> senses;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<String> gears;
     @ManyToMany
     private List<Language> languages;

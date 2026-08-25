@@ -6,10 +6,12 @@ import fr.alium.dndapi.feature.actionDnd.entity.dto.ActionDTO;
 import fr.alium.dndapi.feature.creature.entity.Creature;
 import fr.alium.dndapi.feature.creature.entity.Difficulty;
 import fr.alium.dndapi.feature.creature.entity.dto.CreatureDTO;
+import fr.alium.dndapi.feature.creature.entity.dto.CreatureResponseDTO;
 import fr.alium.dndapi.feature.language.Language;
 import fr.alium.dndapi.feature.language.LanguageRepository;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -132,20 +134,26 @@ public class CreatureService {
         creatureRepository.save(creature);
     }
 
-    public List<Creature> getAllCreatures() {
+    @Transactional(readOnly = true) // Garde la session ouverte
+    public List<CreatureResponseDTO> getAllCreatures() {
         List<Creature> creatures = creatureRepository.findAll();
+
+        // Force l'initialisation des collections LAZY
         creatures.forEach(creature -> {
-            Hibernate.initialize(creature.getActions());
+            Hibernate.initialize(creature.getSpeeds());
             Hibernate.initialize(creature.getSkills());
             Hibernate.initialize(creature.getSenses());
-            Hibernate.initialize(creature.getLanguages());
-            Hibernate.initialize(creature.getStats());
+            Hibernate.initialize(creature.getGears());
+            Hibernate.initialize(creature.getActions());
             Hibernate.initialize(creature.getResistances());
             Hibernate.initialize(creature.getImmunities());
             Hibernate.initialize(creature.getVulnerabilities());
-//            Hibernate.initialize(creature.getGears());
+            Hibernate.initialize(creature.getStats());
+            Hibernate.initialize(creature.getLanguages());
         });
 
-        return creatures;
+        return creatures.stream()
+                .map(creatureMapper::toResponseDto)
+                .toList();
     }
 }

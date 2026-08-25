@@ -41,9 +41,9 @@ public class CreatureMapper implements EntityMapper<Creature, CreatureDTO> {
     public CreatureResponseDTO toResponseDto(Creature creature) {
         List<ActionResponseDTO> actionResponseDTOs = new ArrayList<>();
         if (creature.getActions() != null) {
-            for (ActionDnD actionDnD : creature.getActions()) {
-                actionResponseDTOs.add(actionMapper.toResponseDto(actionDnD));
-            }
+            actionResponseDTOs = creature.getActions().stream()
+                    .map(actionMapper::toResponseDto)
+                    .toList();
         }
 
         Map<String, Integer> skills = new HashMap<>();
