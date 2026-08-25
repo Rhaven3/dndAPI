@@ -139,21 +139,33 @@ public class CreatureService {
         List<Creature> creatures = creatureRepository.findAll();
 
         // Force l'initialisation des collections LAZY
-        creatures.forEach(creature -> {
-            Hibernate.initialize(creature.getSpeeds());
-            Hibernate.initialize(creature.getSkills());
-            Hibernate.initialize(creature.getSenses());
-            Hibernate.initialize(creature.getGears());
-            Hibernate.initialize(creature.getActions());
-            Hibernate.initialize(creature.getResistances());
-            Hibernate.initialize(creature.getImmunities());
-            Hibernate.initialize(creature.getVulnerabilities());
-            Hibernate.initialize(creature.getStats());
-            Hibernate.initialize(creature.getLanguages());
-        });
+        creatures.forEach(this::initialiseCollections);
 
         return creatures.stream()
                 .map(creatureMapper::toResponseDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Creature findById(Long id) {
+        Creature creature = creatureRepository.findById(id).orElse(null);
+        initialiseCollections(creature);
+        return creature;
+    }
+
+    private void initialiseCollections(Creature creature) {
+        if (creature == null) {
+            return;
+        }
+        Hibernate.initialize(creature.getSpeeds());
+        Hibernate.initialize(creature.getSkills());
+        Hibernate.initialize(creature.getSenses());
+        Hibernate.initialize(creature.getGears());
+        Hibernate.initialize(creature.getActions());
+        Hibernate.initialize(creature.getResistances());
+        Hibernate.initialize(creature.getImmunities());
+        Hibernate.initialize(creature.getVulnerabilities());
+        Hibernate.initialize(creature.getStats());
+        Hibernate.initialize(creature.getLanguages());
     }
 }

@@ -37,15 +37,12 @@ public class CreatureController {
     @GetMapping
     public ResponseEntity<List<CreatureResponseDTO>> readAll() {
         List<CreatureResponseDTO> creatureResponseDTOS = creatureService.getAllCreatures();
-//        List<CreatureResponseDTO> creatureResponseDTOS = creatureRepository.findAll().stream()
-//                .map(creatureMapper::toResponseDto)
-//                .toList();
         return ResponseEntity.ok(creatureResponseDTOS);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<Creature> findById(@PathVariable Long id) {
-        Creature creature = creatureRepository.findById(id).orElse(null);
+        Creature creature = creatureService.findById(id);
         if (creature == null) {
             return ResponseEntity.notFound().build();
         }
