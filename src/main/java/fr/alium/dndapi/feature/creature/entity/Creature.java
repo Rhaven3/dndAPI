@@ -72,6 +72,6 @@ public class Creature {
     private List<Language> languages;
     @Embedded
     private Difficulty difficulty;
-    @OneToMany(mappedBy = "creature", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "creature", cascade = CascadeType.MERGE, orphanRemoval = true)
     private List<ActionDnD> actions;
 }

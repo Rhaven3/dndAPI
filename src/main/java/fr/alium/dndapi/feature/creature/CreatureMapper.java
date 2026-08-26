@@ -14,6 +14,7 @@ import fr.alium.dndapi.feature.creature.entity.enums.SenseEnum;
 import fr.alium.dndapi.feature.creature.entity.enums.SkillEnum;
 import fr.alium.dndapi.feature.language.Language;
 import fr.alium.dndapi.feature.language.LanguageRepository;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -167,4 +168,53 @@ public class CreatureMapper implements EntityMapper<Creature, CreatureDTO> {
                 .build();
     }
 
+    public Creature toEntityFromResponseDto(@Valid CreatureResponseDTO creatureResponseDto) {
+        Map<SkillEnum, Integer> skills = new HashMap<>();
+        if (creatureResponseDto.getSkills() != null) {
+            for (Map.Entry<String, Integer> entry : creatureResponseDto.getSkills().entrySet()) {
+                skills.put(SkillEnum.fromString(entry.getKey()), entry.getValue());
+            }
+        }
+
+        Map<SenseEnum, Integer> senses = new HashMap<>();
+        if (creatureResponseDto.getSenses() != null) {
+            for (Map.Entry<String, Integer> entry : creatureResponseDto.getSenses().entrySet()) {
+                senses.put(SenseEnum.fromString(entry.getKey()), entry.getValue());
+            }
+        }
+
+        List<ActionDnD> actions = new ArrayList<>();
+        if (creatureResponseDto.getActions() != null) {
+            actions = creatureResponseDto.getActions().stream()
+                    .map(actionMapper::toEntityFromResponseDto)
+                    .toList();
+        }
+
+
+        return Creature.builder()
+                .name(creatureResponseDto.getName())
+                .description(creatureResponseDto.getDescription())
+                .size(creatureResponseDto.getSize())
+                .type(creatureResponseDto.getType())
+                .alignment(creatureResponseDto.getAlignment())
+                .habitat(creatureResponseDto.getHabitat())
+                .treasure(creatureResponseDto.getTreasure())
+                .book(creatureResponseDto.getBook())
+                .image(creatureResponseDto.getImage())
+                .health(creatureResponseDto.getHealth())
+                .baseCA(creatureResponseDto.getBaseCA())
+                .CAspecification(creatureResponseDto.getCaSpecification())
+                .speeds(creatureResponseDto.getSpeeds())
+                .stats(creatureResponseDto.getStats())
+                .vulnerabilities(creatureResponseDto.getVulnerabilities())
+                .resistances(creatureResponseDto.getResistances())
+                .immunities(creatureResponseDto.getImmunities())
+                .skills(skills)
+                .senses(senses)
+                .languages(creatureResponseDto.getLanguages())
+                .gears(creatureResponseDto.getGears())
+                .difficulty(creatureResponseDto.getDifficulty())
+                .actions(actions)
+                .build();
+    }
 }

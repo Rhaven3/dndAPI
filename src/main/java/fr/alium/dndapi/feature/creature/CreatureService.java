@@ -1,5 +1,6 @@
 package fr.alium.dndapi.feature.creature;
 
+import fr.alium.dndapi.feature.actionDnd.ActionDnDRepository;
 import fr.alium.dndapi.feature.actionDnd.ActionMapper;
 import fr.alium.dndapi.feature.actionDnd.entity.ActionDnD;
 import fr.alium.dndapi.feature.actionDnd.entity.dto.ActionDTO;
@@ -9,25 +10,29 @@ import fr.alium.dndapi.feature.creature.entity.dto.CreatureDTO;
 import fr.alium.dndapi.feature.creature.entity.dto.CreatureResponseDTO;
 import fr.alium.dndapi.feature.language.Language;
 import fr.alium.dndapi.feature.language.LanguageRepository;
+import jakarta.validation.Valid;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CreatureService {
     private final CreatureRepository creatureRepository;
     private final LanguageRepository languageRepository;
+    private final ActionDnDRepository actionDnDRepository;
     private final ActionMapper actionMapper;
     private final CreatureMapper creatureMapper;
 
     private final List<List<Integer>> subsetXP;
     private final List<Integer> xpTable;
 
-    public CreatureService(CreatureRepository creatureRepository, LanguageRepository languageRepository, ActionMapper actionMapper, CreatureMapper creatureMapper) {
+    public CreatureService(CreatureRepository creatureRepository, LanguageRepository languageRepository, ActionDnDRepository actionDnDRepository, ActionMapper actionMapper, CreatureMapper creatureMapper) {
         this.creatureRepository = creatureRepository;
         this.languageRepository = languageRepository;
+        this.actionDnDRepository = actionDnDRepository;
         this.actionMapper = actionMapper;
         this.creatureMapper = creatureMapper;
         this.subsetXP = new ArrayList<>();
@@ -167,5 +172,35 @@ public class CreatureService {
         Hibernate.initialize(creature.getVulnerabilities());
         Hibernate.initialize(creature.getStats());
         Hibernate.initialize(creature.getLanguages());
+    }
+
+    @Transactional
+    public boolean update(@Valid CreatureResponseDTO creatureResponseDto) {
+        boolean exists = creatureRepository.existsById(creatureResponseDto.getId());
+        if (!exists) {
+            return false;
+        }
+
+        Creature creature = creatureMapper.toEntityFromResponseDto(creatureResponseDto);
+
+        // creation language enfant
+        if (!creatureResponseDto.getLanguages().isEmpty()) {
+            languageRepository.saveAll(creatureResponseDto.getLanguages());
+        }
+
+        List<ActionDnD> actions = new ArrayList<>();
+        if (!creatureResponseDto.getActions().isEmpty()) {
+            actions = creatureResponseDto.getActions().stream()
+                    .map(action -> {
+                        ActionDnD actionDnD = actionMapper.toEntityFromResponseDto(action);
+                        actionDnD.setCreature(creature);
+                        return actionDnD;
+                    })
+                    .toList();
+        }
+
+        actionDnDRepository.saveAll(actions);
+        creatureRepository.save(creature);
+        return true;
     }
 }

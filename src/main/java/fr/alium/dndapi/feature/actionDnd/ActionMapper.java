@@ -35,4 +35,13 @@ public class ActionMapper implements EntityMapper<ActionDnD, ActionDTO> {
                 .type(ActionEnum.fromString(actionDTO.getActionType()))
                 .build();
     }
+
+    public ActionDnD toEntityFromResponseDto(ActionResponseDTO actionResponseDTO) {
+        return ActionDnD.builder()
+                .id(actionResponseDTO.getId())
+                .name(actionResponseDTO.getName())
+                .description(actionResponseDTO.getDescription())
+                .type(ActionEnum.fromString(actionResponseDTO.getType()))
+                .build();
+    }
 }

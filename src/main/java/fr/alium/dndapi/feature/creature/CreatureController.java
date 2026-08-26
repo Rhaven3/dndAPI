@@ -41,12 +41,12 @@ public class CreatureController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Creature> findById(@PathVariable Long id) {
+    public ResponseEntity<CreatureResponseDTO> findById(@PathVariable Long id) {
         Creature creature = creatureService.findById(id);
         if (creature == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(creature);
+        return ResponseEntity.ok(creatureMapper.toResponseDto(creature));
     }
 
     @PostMapping
@@ -59,19 +59,15 @@ public class CreatureController {
         return ResponseEntity.ok("creature created");
     }
 
-    @PatchMapping("{id}")
     @PutMapping("{id}")
-    public ResponseEntity<?> update(@Valid @RequestBody Creature creature, @PathVariable Long id, BindingResult result) {
+    public ResponseEntity<?> update(@Valid @RequestBody CreatureResponseDTO creatureResponseDTO, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-        boolean exists = creatureRepository.existsById(id);
-        if (!exists) {
+        boolean exist = creatureService.update(creatureResponseDTO);
+        if (!exist) {
             return ResponseEntity.notFound().build();
         }
-
-        creature.setId(id);
-        creatureRepository.save(creature);
         return ResponseEntity.ok("creature updated");
     }
 
