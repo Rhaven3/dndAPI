@@ -13,4 +13,14 @@ public enum EncounterDifficultyEnum {
     EncounterDifficultyEnum(int difficulty) {
         this.value = difficulty;
     }
+
+    public static EncounterDifficultyEnum fromInt(int difficulty) {
+        return switch (difficulty) {
+            case 0 -> EASY;
+            case 1 -> MEDIUM;
+            case 2 -> HARD;
+            case 3 -> MORTAL;
+            default -> throw new IllegalArgumentException("Invalid difficulty value: " + difficulty);
+        };
+    }
 }

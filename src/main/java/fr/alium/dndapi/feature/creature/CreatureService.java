@@ -5,7 +5,6 @@ import fr.alium.dndapi.feature.actionDnd.ActionMapper;
 import fr.alium.dndapi.feature.actionDnd.entity.ActionDnD;
 import fr.alium.dndapi.feature.actionDnd.entity.dto.ActionDTO;
 import fr.alium.dndapi.feature.creature.entity.Creature;
-import fr.alium.dndapi.feature.creature.entity.Difficulty;
 import fr.alium.dndapi.feature.creature.entity.dto.CreatureDTO;
 import fr.alium.dndapi.feature.creature.entity.dto.CreatureResponseDTO;
 import fr.alium.dndapi.feature.language.Language;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class CreatureService {
@@ -26,15 +24,22 @@ public class CreatureService {
     private final ActionMapper actionMapper;
     private final CreatureMapper creatureMapper;
 
-    private final List<List<Integer>> subsetXP;
+    private final List<Stack<Integer>> subsetXP;
     private final List<Integer> xpTable;
+    private final List<Float> crTable;
 
-    public CreatureService(CreatureRepository creatureRepository, LanguageRepository languageRepository, ActionDnDRepository actionDnDRepository, ActionMapper actionMapper, CreatureMapper creatureMapper) {
+    public CreatureService(CreatureRepository creatureRepository, LanguageRepository languageRepository, ActionDnDRepository actionDnDRepository, ActionMapper actionMapper, CreatureMapper creatureMapper, List<Float> crTable) {
         this.creatureRepository = creatureRepository;
         this.languageRepository = languageRepository;
         this.actionDnDRepository = actionDnDRepository;
         this.actionMapper = actionMapper;
         this.creatureMapper = creatureMapper;
+        this.crTable = Arrays.asList(
+                0.125f, 0.25f, 0.5f,
+                1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f,
+                11f, 12f, 13f, 14f, 15f, 16f, 17f, 18f, 19f, 20f,
+                20f, 21f, 22f, 23f, 24f, 25f, 26f, 27f, 28f, 29f, 30f
+        );
         this.subsetXP = new ArrayList<>();
         this.xpTable = Arrays.asList(25, 50, 100,
                 200, 450, 700, 1100, 1800, 2300, 2900, 3900, 5000, 5900,
@@ -43,13 +48,23 @@ public class CreatureService {
         );
     }
 
-    public List<Creature> findByXpTreshold(int xptreshold, int numberCreatures) {
+    public List<Creature> findByXpTreshold(int xptreshold, int numberCreatures, Float precision) {
         Random random = new Random();
         List<Creature> creatures = new ArrayList<>();
-        List<List<Integer>> allSubsetCR = findAllSubsetCR(xptreshold, numberCreatures);
-        List<Integer> subsetCR = allSubsetCR.get(random.nextInt(allSubsetCR.size()));
+        List<List<Integer>> allSubsetCR = new ArrayList<>();
+        boolean exactExist = allSubsetCR.addAll(findAllSubsetCR(xptreshold , numberCreatures));
+        if (!exactExist) {
+            // subset from a xpTreshold +- precision
+            for (float i = 0.01f; i <= precision; i += 0.01f) {
+                allSubsetCR.addAll(findAllSubsetCR(Math.round(xptreshold*(1+i)) , numberCreatures));
+                allSubsetCR.addAll(findAllSubsetCR(Math.round(xptreshold*(1-i)) , numberCreatures));
+            }
+        }
+        int randomSubset = random.nextInt(allSubsetCR.size());
+        List<Integer> subsetCR = allSubsetCR.get(randomSubset);
 
-        for (Integer cr : subsetCR) {
+        for (Integer crIndex : subsetCR) {
+            float cr = crTable.get(crIndex-1);
             creatures.add(findRandomByCR(cr));
         }
         return creatures;
@@ -74,7 +89,7 @@ public class CreatureService {
 
     private void backtrack(int numberCR, int targetSum, int start, Stack<Integer> current, int currentSum, int countCR) {
         if (countCR == numberCR && currentSum == targetSum) {
-            subsetXP.add(current);
+            subsetXP.add((Stack<Integer>) current.clone());
             return;
         }
         if (countCR >= numberCR || currentSum >= targetSum) {
@@ -88,7 +103,7 @@ public class CreatureService {
     }
 
     public Creature findRandomByCR(float cr) {
-        List<Creature> creatures = creatureRepository.findAllByDifficulty(Difficulty.builder().ChallengeRate(cr).build());
+        List<Creature> creatures = creatureRepository.findAllByChallengeRate(cr);
         Random random = new Random();
         int index = random.nextInt(creatures.size());
         return creatures.get(index);
@@ -158,7 +173,7 @@ public class CreatureService {
         return creature;
     }
 
-    private void initialiseCollections(Creature creature) {
+    public void initialiseCollections(Creature creature) {
         if (creature == null) {
             return;
         }

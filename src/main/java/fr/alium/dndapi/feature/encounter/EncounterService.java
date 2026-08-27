@@ -4,39 +4,46 @@ import fr.alium.dndapi.feature.creature.CreatureService;
 import fr.alium.dndapi.feature.creature.entity.Creature;
 import fr.alium.dndapi.feature.encounter.entity.Encounter;
 import fr.alium.dndapi.feature.encounter.entity.EncounterDifficultyEnum;
+import fr.alium.dndapi.feature.encounter.entity.dto.EncounterResponseDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class EncounterService implements IEncounterService {
-    EncounterRepository encounterRepository;
-    CreatureService creatureService;
+public class EncounterService {
+    private final EncounterRepository encounterRepository;
+    private final CreatureService creatureService;
+    private final EncounterMapper encounterMapper;
 
-    public EncounterService(EncounterRepository encounterRepository, CreatureService creatureService) {
+    public EncounterService(EncounterRepository encounterRepository, CreatureService creatureService, EncounterMapper encounterMapper) {
         this.encounterRepository = encounterRepository;
         this.creatureService = creatureService;
+        this.encounterMapper = encounterMapper;
     }
 
-    @Override
-    public Encounter generate(EncounterDifficultyEnum difficulty, Integer partySize, Integer partyAverageLvl, Integer numberCreatures) {
+    @Transactional()
+    public EncounterResponseDTO generate(EncounterDifficultyEnum difficulty, Integer partySize, Integer partyAverageLvl, Integer numberCreatures) {
         if (partySize == null) partySize = 4;
 //        if (numberEncounters == null) numberEncounters = 1;
 
         int Xptreshold = getXpTreshold(difficulty, partyAverageLvl) * partySize;
 
-        List<Creature> creatures = creatureService.findByXpTreshold(Xptreshold, numberCreatures);
+        List<Creature> creatures = creatureService.findByXpTreshold(Xptreshold, numberCreatures, 0.15f);
 
         Encounter encounter = Encounter.builder()
                 .name("Generated Encounter " + Xptreshold)
                 .creatures(creatures)
                 .build();
         encounterRepository.save(encounter);
-        return encounter;
+        for (Creature creature : creatures) {
+            creatureService.initialiseCollections(creature);
+        }
+        EncounterResponseDTO encounterResponseDTO = encounterMapper.toResponseDto(encounter);
+        return encounterResponseDTO;
     }
 
-    @Override
     public int getXpTreshold(EncounterDifficultyEnum difficulty, Integer partyAverageLvl) {
         List<List<Integer>> xpTresholdTable = new ArrayList<>();
         xpTresholdTable.add(List.of(25, 50, 75, 100));

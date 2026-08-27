@@ -1,4 +1,4 @@
-package fr.alium.dndapi.feature.encounter.entity;
+package fr.alium.dndapi.feature.encounter.entity.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class GenerateEncounterDTO {
-    private EncounterDifficultyEnum difficulty;
+    private Integer difficulty;
     private Integer partySize;
     private Integer partyAverageLvl;
     private Integer numberCreatures;

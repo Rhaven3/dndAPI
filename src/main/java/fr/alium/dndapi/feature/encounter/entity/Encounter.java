@@ -22,7 +22,4 @@ public class Encounter {
     private String description;
     @ManyToMany
     private List<Creature> creatures;
-
-    public void getDifficulty() {
-    }
 }
