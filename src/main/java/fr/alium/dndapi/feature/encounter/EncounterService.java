@@ -1,9 +1,12 @@
 package fr.alium.dndapi.feature.encounter;
 
+import fr.alium.dndapi.feature.creature.CreatureRepository;
 import fr.alium.dndapi.feature.creature.CreatureService;
 import fr.alium.dndapi.feature.creature.entity.Creature;
+import fr.alium.dndapi.feature.creature.entity.dto.CreatureResponseDTO;
 import fr.alium.dndapi.feature.encounter.entity.Encounter;
 import fr.alium.dndapi.feature.encounter.entity.EncounterDifficultyEnum;
+import fr.alium.dndapi.feature.encounter.entity.dto.EncounterDTO;
 import fr.alium.dndapi.feature.encounter.entity.dto.EncounterResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +19,13 @@ public class EncounterService {
     private final EncounterRepository encounterRepository;
     private final CreatureService creatureService;
     private final EncounterMapper encounterMapper;
+    private final CreatureRepository creatureRepository;
 
-    public EncounterService(EncounterRepository encounterRepository, CreatureService creatureService, EncounterMapper encounterMapper) {
+    public EncounterService(EncounterRepository encounterRepository, CreatureService creatureService, EncounterMapper encounterMapper, CreatureRepository creatureRepository) {
         this.encounterRepository = encounterRepository;
         this.creatureService = creatureService;
         this.encounterMapper = encounterMapper;
+        this.creatureRepository = creatureRepository;
     }
 
     @Transactional()
@@ -36,7 +41,7 @@ public class EncounterService {
     }
 
     @Transactional()
-    public EncounterResponseDTO generate(EncounterDifficultyEnum difficulty, Integer partySize, Integer partyAverageLvl, Integer numberCreatures) {
+    public EncounterResponseDTO generate(Boolean hard, EncounterDifficultyEnum difficulty, Integer partySize, Integer partyAverageLvl, Integer numberCreatures) {
         if (partySize == null) partySize = 4;
 //        if (numberEncounters == null) numberEncounters = 1;
 
@@ -48,7 +53,9 @@ public class EncounterService {
                 .name("Generated Encounter " + Xptreshold)
                 .creatures(creatures)
                 .build();
-        encounterRepository.save(encounter);
+        if (hard) {
+            encounterRepository.save(encounter);
+        }
         for (Creature creature : creatures) {
             creatureService.initialiseCollections(creature);
         }
@@ -79,5 +86,15 @@ public class EncounterService {
         xpTresholdTable.add(List.of(2800, 5700, 8500, 12700));
 
         return xpTresholdTable.get(partyAverageLvl).get(difficulty.getValue());
+    }
+
+    @Transactional()
+    public void create(EncounterDTO encounterDTO) {
+        List<Creature> creatures = encounterDTO.getCreatures().stream()
+                .map(creatureService::findById)
+                .toList();
+        Encounter encounter = encounterMapper.toEntity(encounterDTO);
+        encounter.setCreatures(creatures);
+        encounterRepository.save(encounter);
     }
 }

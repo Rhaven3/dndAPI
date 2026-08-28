@@ -113,7 +113,7 @@ public class CreatureService {
 
         // creation language enfant
         List<Language> languages = new ArrayList<>();
-        if (!creatureDTO.getLanguages().isEmpty()) {
+        if (creatureDTO.getLanguages() != null) {
             for (String language : creatureDTO.getLanguages()) {
                 Language languageEntity = Language.builder()
                         .name(language)

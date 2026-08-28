@@ -2,6 +2,7 @@ package fr.alium.dndapi.feature.encounter;
 
 import fr.alium.dndapi.feature.encounter.entity.Encounter;
 import fr.alium.dndapi.feature.encounter.entity.EncounterDifficultyEnum;
+import fr.alium.dndapi.feature.encounter.entity.dto.EncounterDTO;
 import fr.alium.dndapi.feature.encounter.entity.dto.EncounterResponseDTO;
 import fr.alium.dndapi.feature.encounter.entity.dto.GenerateEncounterDTO;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +16,10 @@ import java.util.List;
 public class EncounterController {
     private final EncounterRepository encounterRepository;
     private final EncounterService encounterService;
-    private final EncounterMapper encounterMapper;
 
-    public EncounterController(EncounterRepository encounterRepository, EncounterService encounterService, EncounterMapper encounterMapper) {
+    public EncounterController(EncounterRepository encounterRepository, EncounterService encounterService) {
         this.encounterRepository = encounterRepository;
         this.encounterService = encounterService;
-        this.encounterMapper = encounterMapper;
     }
 
     @GetMapping
@@ -38,17 +37,15 @@ public class EncounterController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Encounter encounter, BindingResult result) {
+    public ResponseEntity<?> create(@RequestBody EncounterDTO encounterDTO, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
-
-        encounterRepository.save(encounter);
+        encounterService.create(encounterDTO);
         return ResponseEntity.ok("encounter created");
     }
 
     @PutMapping("{id}")
-    @PatchMapping("{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Encounter encounter, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
@@ -69,19 +66,12 @@ public class EncounterController {
         encounterRepository.deleteById(id);
         return ResponseEntity.ok("encounter deleted");
     }
-
-
     @GetMapping("/generate")
-    public ResponseEntity<?> generate(@RequestBody GenerateEncounterDTO generateEncounterDTO, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (generateEncounterDTO.getDifficulty() == null) return ResponseEntity.badRequest().build();
-        if (generateEncounterDTO.getPartySize() == null) return ResponseEntity.badRequest().build();
-        if (generateEncounterDTO.getNumberCreatures() == null) return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> generateSoft(@RequestBody GenerateEncounterDTO generateEncounterDTO, BindingResult result) {
+        if (verifyGenerateEncounterDTO(generateEncounterDTO, result)) return ResponseEntity.badRequest().build();
 
         EncounterResponseDTO encounterResponseDto = encounterService.generate(
+                false,
                 EncounterDifficultyEnum.fromInt(generateEncounterDTO.getDifficulty()),
                 generateEncounterDTO.getPartySize(),
                 generateEncounterDTO.getPartyAverageLvl(),
@@ -89,4 +79,31 @@ public class EncounterController {
         );
         return ResponseEntity.ok(encounterResponseDto);
     }
+
+    @GetMapping("/generate/hard")
+    public ResponseEntity<?> generate(@RequestBody GenerateEncounterDTO generateEncounterDTO, BindingResult result) {
+        if (verifyGenerateEncounterDTO(generateEncounterDTO, result)) return ResponseEntity.badRequest().build();
+
+        EncounterResponseDTO encounterResponseDto = encounterService.generate(
+                true,
+                EncounterDifficultyEnum.fromInt(generateEncounterDTO.getDifficulty()),
+                generateEncounterDTO.getPartySize(),
+                generateEncounterDTO.getPartyAverageLvl(),
+                generateEncounterDTO.getNumberCreatures()
+        );
+        return ResponseEntity.ok(encounterResponseDto);
+    }
+
+    private boolean verifyGenerateEncounterDTO(@RequestBody GenerateEncounterDTO generateEncounterDTO, BindingResult result) {
+        if (result.hasErrors()) {
+            return true;
+        }
+
+        if (generateEncounterDTO.getDifficulty() == null) return true;
+        if (generateEncounterDTO.getPartySize() == null) return true;
+        if (generateEncounterDTO.getNumberCreatures() == null) return true;
+        return false;
+    }
+
+
 }

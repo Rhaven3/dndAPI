@@ -26,7 +26,7 @@ public class EncounterMapper implements EntityMapper<Encounter, EncounterDTO> {
 
     public EncounterResponseDTO toResponseDto(Encounter encounter) {
         List<CreatureResponseDTO> creatures = new ArrayList<>();
-        if(encounter.getCreatures() != null) {
+        if (encounter.getCreatures() != null) {
             creatures = encounter.getCreatures().stream()
                     .map(creatureMapper::toResponseDto)
                     .toList();
@@ -42,7 +42,7 @@ public class EncounterMapper implements EntityMapper<Encounter, EncounterDTO> {
 
     @Override
     public Encounter toEntity(EncounterDTO encounterDTO) {
-        return null;
+        return Encounter.builder().name(encounterDTO.getName()).description(encounterDTO.getDescription()).build();
     }
 
 

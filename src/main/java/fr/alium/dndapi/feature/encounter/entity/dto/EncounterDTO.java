@@ -14,5 +14,5 @@ import java.util.List;
 public class EncounterDTO {
     private String name;
     private String description;
-    private List<Integer> creatures;
+    private List<Long> creatures;
 }
