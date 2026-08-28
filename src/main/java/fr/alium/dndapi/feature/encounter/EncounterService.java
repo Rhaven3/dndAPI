@@ -24,6 +24,18 @@ public class EncounterService {
     }
 
     @Transactional()
+    public List<EncounterResponseDTO> getAll() {
+        return encounterRepository.findAll().stream()
+                .map(encounter -> {
+                    for (Creature creature : encounter.getCreatures()) {
+                        creatureService.initialiseCollections(creature);
+                    }
+                    return encounterMapper.toResponseDto(encounter);
+                })
+                .toList();
+    }
+
+    @Transactional()
     public EncounterResponseDTO generate(EncounterDifficultyEnum difficulty, Integer partySize, Integer partyAverageLvl, Integer numberCreatures) {
         if (partySize == null) partySize = 4;
 //        if (numberEncounters == null) numberEncounters = 1;
@@ -40,8 +52,7 @@ public class EncounterService {
         for (Creature creature : creatures) {
             creatureService.initialiseCollections(creature);
         }
-        EncounterResponseDTO encounterResponseDTO = encounterMapper.toResponseDto(encounter);
-        return encounterResponseDTO;
+        return encounterMapper.toResponseDto(encounter);
     }
 
     public int getXpTreshold(EncounterDifficultyEnum difficulty, Integer partyAverageLvl) {

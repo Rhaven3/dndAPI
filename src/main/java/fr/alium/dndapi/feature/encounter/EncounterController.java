@@ -13,17 +13,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/encounter")
 public class EncounterController {
-    EncounterRepository encounterRepository;
-    EncounterService encounterService;
+    private final EncounterRepository encounterRepository;
+    private final EncounterService encounterService;
+    private final EncounterMapper encounterMapper;
 
-    public EncounterController(EncounterRepository encounterRepository, EncounterService encounterService) {
+    public EncounterController(EncounterRepository encounterRepository, EncounterService encounterService, EncounterMapper encounterMapper) {
         this.encounterRepository = encounterRepository;
         this.encounterService = encounterService;
+        this.encounterMapper = encounterMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<Encounter>> readAll() {
-        return ResponseEntity.ok(encounterRepository.findAll());
+    public ResponseEntity<List<EncounterResponseDTO>> readAll() {
+        return ResponseEntity.ok(encounterService.getAll());
     }
 
     @GetMapping("{id}")
