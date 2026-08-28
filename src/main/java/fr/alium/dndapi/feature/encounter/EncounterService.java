@@ -97,4 +97,8 @@ public class EncounterService {
         encounter.setCreatures(creatures);
         encounterRepository.save(encounter);
     }
+
+    public Encounter update(Long id, EncounterDTO encounterDTO) {
+        return null;
+    }
 }

@@ -46,14 +46,14 @@ public class EncounterController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Encounter encounter, BindingResult result) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody EncounterDTO encounterDTO, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
-        if (!encounterRepository.existsById(encounter.getId())) {
+        if (!encounterRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        encounter.setId(id);
+        Encounter encounter = encounterService.update(id, encounterDTO);
         encounterRepository.save(encounter);
         return ResponseEntity.ok("encounter updated");
     }
