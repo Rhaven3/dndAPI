@@ -52,19 +52,19 @@ public class CreatureService {
         Random random = new Random();
         List<Creature> creatures = new ArrayList<>();
         List<List<Integer>> allSubsetCR = new ArrayList<>();
-        boolean exactExist = allSubsetCR.addAll(findAllSubsetCR(xptreshold , numberCreatures));
+        boolean exactExist = allSubsetCR.addAll(findAllSubsetCR(xptreshold, numberCreatures));
         if (!exactExist) {
             // subset from a xpTreshold +- precision
             for (float i = 0.01f; i <= precision; i += 0.01f) {
-                allSubsetCR.addAll(findAllSubsetCR(Math.round(xptreshold*(1+i)) , numberCreatures));
-                allSubsetCR.addAll(findAllSubsetCR(Math.round(xptreshold*(1-i)) , numberCreatures));
+                allSubsetCR.addAll(findAllSubsetCR(Math.round(xptreshold * (1 + i)), numberCreatures));
+                allSubsetCR.addAll(findAllSubsetCR(Math.round(xptreshold * (1 - i)), numberCreatures));
             }
         }
         int randomSubset = random.nextInt(allSubsetCR.size());
         List<Integer> subsetCR = allSubsetCR.get(randomSubset);
 
         for (Integer crIndex : subsetCR) {
-            float cr = crTable.get(crIndex-1);
+            float cr = crTable.get(crIndex - 1);
             creatures.add(findRandomByCR(cr));
         }
         return creatures;
@@ -109,11 +109,6 @@ public class CreatureService {
         return creatures.get(index);
     }
 
-    public int getXp(Creature creature) {
-        float cr = creature.getDifficulty().getChallengeRate();
-        return xpTable.get((int) Math.ceil(cr) - 1);
-    }
-
     public void create(CreatureDTO creatureDTO) {
 
         // creation language enfant
@@ -154,7 +149,7 @@ public class CreatureService {
         creatureRepository.save(creature);
     }
 
-    @Transactional(readOnly = true) // Garde la session ouverte
+    @Transactional(readOnly = true)
     public List<CreatureResponseDTO> getAllCreatures() {
         List<Creature> creatures = creatureRepository.findAll();
 
@@ -198,7 +193,7 @@ public class CreatureService {
 
         Creature creature = creatureMapper.toEntityFromResponseDto(creatureResponseDto);
 
-        // creation language enfant
+        // update language enfant
         if (!creatureResponseDto.getLanguages().isEmpty()) {
             languageRepository.saveAll(creatureResponseDto.getLanguages());
         }

@@ -192,6 +192,7 @@ public class CreatureMapper implements EntityMapper<Creature, CreatureDTO> {
 
 
         return Creature.builder()
+                .id(creatureResponseDto.getId())
                 .name(creatureResponseDto.getName())
                 .description(creatureResponseDto.getDescription())
                 .size(creatureResponseDto.getSize())
